@@ -6,7 +6,7 @@ import gums from "@/assets/edu-gums.jpg";
 import sensitivity from "@/assets/edu-sensitivity.jpg";
 import whitening from "@/assets/edu-whitening.jpg";
 
-export const Route = createFileRoute("/education")({
+export const Route = createFileRoute("/education/")({
   component: Education,
 });
 

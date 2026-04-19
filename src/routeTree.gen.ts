@@ -21,10 +21,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
-import { Route as EducationRouteImport } from './routes/education'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as AssessmentRouteImport } from './routes/assessment'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EducationIndexRouteImport } from './routes/education.index'
 import { Route as EducationSlugRouteImport } from './routes/education.$slug'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -87,11 +87,6 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EducationRoute = EducationRouteImport.update({
-  id: '/education',
-  path: '/education',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EditProfileRoute = EditProfileRouteImport.update({
   id: '/edit-profile',
   path: '/edit-profile',
@@ -107,17 +102,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EducationIndexRoute = EducationIndexRouteImport.update({
+  id: '/education/',
+  path: '/education/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EducationSlugRoute = EducationSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => EducationRoute,
+  id: '/education/$slug',
+  path: '/education/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
-  '/education': typeof EducationRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
@@ -131,12 +130,12 @@ export interface FileRoutesByFullPath {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/education/$slug': typeof EducationSlugRoute
+  '/education/': typeof EducationIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
-  '/education': typeof EducationRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
@@ -150,13 +149,13 @@ export interface FileRoutesByTo {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/education/$slug': typeof EducationSlugRoute
+  '/education': typeof EducationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
-  '/education': typeof EducationRouteWithChildren
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
@@ -170,6 +169,7 @@ export interface FileRoutesById {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/education/$slug': typeof EducationSlugRoute
+  '/education/': typeof EducationIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,7 +177,6 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment'
     | '/edit-profile'
-    | '/education'
     | '/feedback'
     | '/forgot-password'
     | '/home'
@@ -191,12 +190,12 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/education/$slug'
+    | '/education/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/assessment'
     | '/edit-profile'
-    | '/education'
     | '/feedback'
     | '/forgot-password'
     | '/home'
@@ -210,12 +209,12 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/education/$slug'
+    | '/education'
   id:
     | '__root__'
     | '/'
     | '/assessment'
     | '/edit-profile'
-    | '/education'
     | '/feedback'
     | '/forgot-password'
     | '/home'
@@ -229,13 +228,13 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/education/$slug'
+    | '/education/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssessmentRoute: typeof AssessmentRoute
   EditProfileRoute: typeof EditProfileRoute
-  EducationRoute: typeof EducationRouteWithChildren
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HomeRoute: typeof HomeRoute
@@ -248,6 +247,8 @@ export interface RootRouteChildren {
   ResultRoute: typeof ResultRoute
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
+  EducationSlugRoute: typeof EducationSlugRoute
+  EducationIndexRoute: typeof EducationIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -336,13 +337,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/education': {
-      id: '/education'
-      path: '/education'
-      fullPath: '/education'
-      preLoaderRoute: typeof EducationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/edit-profile': {
       id: '/edit-profile'
       path: '/edit-profile'
@@ -364,33 +358,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/education/': {
+      id: '/education/'
+      path: '/education'
+      fullPath: '/education/'
+      preLoaderRoute: typeof EducationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/education/$slug': {
       id: '/education/$slug'
-      path: '/$slug'
+      path: '/education/$slug'
       fullPath: '/education/$slug'
       preLoaderRoute: typeof EducationSlugRouteImport
-      parentRoute: typeof EducationRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface EducationRouteChildren {
-  EducationSlugRoute: typeof EducationSlugRoute
-}
-
-const EducationRouteChildren: EducationRouteChildren = {
-  EducationSlugRoute: EducationSlugRoute,
-}
-
-const EducationRouteWithChildren = EducationRoute._addFileChildren(
-  EducationRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssessmentRoute: AssessmentRoute,
   EditProfileRoute: EditProfileRoute,
-  EducationRoute: EducationRouteWithChildren,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HomeRoute: HomeRoute,
@@ -403,6 +391,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResultRoute: ResultRoute,
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,
+  EducationSlugRoute: EducationSlugRoute,
+  EducationIndexRoute: EducationIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
