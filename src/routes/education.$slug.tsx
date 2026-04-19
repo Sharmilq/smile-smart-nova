@@ -133,15 +133,30 @@ function Topic() {
         </ul>
 
         {/* Video placeholder */}
-        <div className="mt-6 rounded-2xl bg-muted aspect-video relative overflow-hidden border border-border">
-          <img src={topic.img} alt="" className="w-full h-full object-cover opacity-50" />
-          <button className="absolute inset-0 flex items-center justify-center">
+        <h2 className="mt-6 font-semibold">Watch & learn</h2>
+        <div className="mt-3 rounded-2xl bg-muted aspect-video relative overflow-hidden border border-border">
+          <img src={topic.img} alt="" className="w-full h-full object-cover opacity-60" />
+          <button className="absolute inset-0 flex items-center justify-center" aria-label="Play video">
             <span className="w-16 h-16 rounded-full bg-card shadow-card flex items-center justify-center">
               <Play className="h-7 w-7 text-primary fill-primary ml-1" />
             </span>
           </button>
           <span className="absolute bottom-2 left-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded">Video</span>
+          <span className="absolute bottom-2 right-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded">{content.duration}</span>
         </div>
+
+        {/* Tips & Best Practices */}
+        <h2 className="mt-6 font-semibold">Tips & Best Practices</h2>
+        <ul className="mt-3 space-y-2">
+          {content.tips.map((tip, i) => (
+            <li key={i} className="flex gap-3 text-sm">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                {i + 1}
+              </span>
+              <span className="pt-0.5">{tip}</span>
+            </li>
+          ))}
+        </ul>
 
         <Link to="/education">
           <Button className="w-full mt-6 h-12 rounded-xl bg-gradient-primary text-primary-foreground">
