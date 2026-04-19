@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
-import { TOPICS } from "./education";
+import { TOPICS } from "./education.index";
 
 export const Route = createFileRoute("/education/$slug")({
   component: Topic,
