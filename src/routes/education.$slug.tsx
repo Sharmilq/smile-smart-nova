@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { TOPICS } from "./education.index";
 
+
 export const Route = createFileRoute("/education/$slug")({
   component: Topic,
 });

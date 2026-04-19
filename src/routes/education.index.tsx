@@ -11,7 +11,7 @@ export const Route = createFileRoute("/education/")({
 });
 
 export const TOPICS = [
-  { slug: "flossing", title: "Flossing 101", subtitle: "Why, when and how to floss", img: flossing },
+  { slug: "flossing", title: "Flossing", subtitle: "Why, when and how to floss", img: flossing },
   { slug: "brushing", title: "Brushing techniques", subtitle: "Master the perfect brush", img: brushing },
   { slug: "gum-care", title: "Gum care", subtitle: "Healthy gums, healthy life", img: gums },
   { slug: "sensitivity", title: "Tooth sensitivity", subtitle: "Causes and treatments", img: sensitivity },
