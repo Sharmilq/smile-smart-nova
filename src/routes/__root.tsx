@@ -28,15 +28,15 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
+      { title: "DentNova — Smart Dental Care for a Healthier Smile" },
+      { name: "description", content: "AI-powered dental health assessment, tooth scanning, education and reminders for a brighter smile." },
+      { name: "author", content: "DentNova" },
+      { name: "theme-color", content: "#7CC6E5" },
+      { property: "og:title", content: "DentNova — Smart Dental Care" },
+      { property: "og:description", content: "Assess your oral health, scan your teeth and get personalized dental tips." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
