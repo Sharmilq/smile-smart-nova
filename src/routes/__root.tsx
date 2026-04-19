@@ -33,10 +33,14 @@ export const Route = createRootRoute({
       { name: "description", content: "AI-powered dental health assessment, tooth scanning, education and reminders for a brighter smile." },
       { name: "author", content: "DentNova" },
       { name: "theme-color", content: "#7CC6E5" },
-      { property: "og:title", content: "DentNova — Smart Dental Care" },
-      { property: "og:description", content: "Assess your oral health, scan your teeth and get personalized dental tips." },
+      { property: "og:title", content: "DentNova — Smart Dental Care for a Healthier Smile" },
+      { property: "og:description", content: "AI-powered dental health assessment, tooth scanning, education and reminders for a brighter smile." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "DentNova — Smart Dental Care for a Healthier Smile" },
+      { name: "twitter:description", content: "AI-powered dental health assessment, tooth scanning, education and reminders for a brighter smile." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3ee32a4e-ef8f-4d99-9569-66d35b05f80b/id-preview-b1bd4dd8--dff7de41-5565-4a57-bcba-e3dea726eb6d.lovable.app-1776592046013.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3ee32a4e-ef8f-4d99-9569-66d35b05f80b/id-preview-b1bd4dd8--dff7de41-5565-4a57-bcba-e3dea726eb6d.lovable.app-1776592046013.png" },
     ],
     links: [
       {
