@@ -34,7 +34,12 @@ function Assessment() {
   const choose = (val: string) => {
     setAnswers((a) => ({ ...a, [q.id]: val }));
     const opt = q.options.find((o) => o.value === val);
-    if (opt?.warn && opt.weight >= 2) setWarn(opt.warn);
+    if (opt?.warn && opt.weight >= 2) {
+      setWarn(opt.warn);
+    } else if (opt && opt.weight === 0) {
+      const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+      toast.success(msg, { duration: 1600 });
+    }
   };
 
   const next = () => {
