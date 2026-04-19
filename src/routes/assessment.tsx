@@ -2,9 +2,18 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, AlertTriangle, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { QUESTIONS, calcScore } from "@/lib/assessment";
+
+const ENCOURAGEMENTS = [
+  "Great! You're maintaining good dental habits 👏",
+  "Good choice! Keep it up 👍",
+  "Nice! You're following recommended dental care ✅",
+  "Excellent! Your smile thanks you ✨",
+  "Awesome! That's the right approach 💙",
+];
 import type { AssessmentAnswers } from "@/lib/store";
 import { store } from "@/lib/store";
 
@@ -25,7 +34,12 @@ function Assessment() {
   const choose = (val: string) => {
     setAnswers((a) => ({ ...a, [q.id]: val }));
     const opt = q.options.find((o) => o.value === val);
-    if (opt?.warn && opt.weight >= 2) setWarn(opt.warn);
+    if (opt?.warn && opt.weight >= 2) {
+      setWarn(opt.warn);
+    } else if (opt && opt.weight === 0) {
+      const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+      toast.success(msg, { duration: 1600 });
+    }
   };
 
   const next = () => {
