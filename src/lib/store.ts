@@ -26,6 +26,14 @@ const KEY_REMINDERS = "dn_reminders";
 const KEY_AUTH = "dn_auth";
 const KEY_ONBOARD = "dn_onboard";
 const KEY_VISITS = "dn_visit_reminders";
+const KEY_HABITS = "dn_habits";
+const KEY_BRUSH_LOG = "dn_brush_log";
+
+export interface HabitDay {
+  date: string; // yyyy-mm-dd
+  brush: boolean;
+  floss: boolean;
+}
 
 export interface Reminder {
   id: string;
@@ -110,6 +118,46 @@ export const store = {
     const all = read<VisitReminder[]>(KEY_VISITS, []);
     write(KEY_VISITS, all.filter(v => v.id !== id));
   },
+  getHabits: () => read<HabitDay[]>(KEY_HABITS, []),
+  toggleHabit: (kind: "brush" | "floss") => {
+    const today = new Date().toISOString().slice(0, 10);
+    const all = read<HabitDay[]>(KEY_HABITS, []);
+    const idx = all.findIndex((h) => h.date === today);
+    if (idx === -1) {
+      const day: HabitDay = { date: today, brush: false, floss: false, [kind]: true } as HabitDay;
+      write(KEY_HABITS, [day, ...all].slice(0, 60));
+    } else {
+      const day = { ...all[idx], [kind]: !all[idx][kind] };
+      const next = [...all];
+      next[idx] = day;
+      write(KEY_HABITS, next);
+    }
+  },
+  getTodayHabit: (): HabitDay => {
+    const today = new Date().toISOString().slice(0, 10);
+    const all = read<HabitDay[]>(KEY_HABITS, []);
+    return all.find((h) => h.date === today) ?? { date: today, brush: false, floss: false };
+  },
+  getHabitStreak: (kind: "brush" | "floss"): number => {
+    const all = read<HabitDay[]>(KEY_HABITS, []);
+    const map = new Map(all.map((h) => [h.date, h]));
+    let streak = 0;
+    const cursor = new Date();
+    // allow today to be missing without breaking streak
+    if (!map.get(cursor.toISOString().slice(0, 10))?.[kind]) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    while (map.get(cursor.toISOString().slice(0, 10))?.[kind]) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  },
+  logBrushSession: () => {
+    const all = read<string[]>(KEY_BRUSH_LOG, []);
+    write(KEY_BRUSH_LOG, [new Date().toISOString(), ...all].slice(0, 50));
+  },
+  getBrushSessions: () => read<string[]>(KEY_BRUSH_LOG, []),
   isAuthed: () => read<boolean>(KEY_AUTH, false),
   setAuthed: (v: boolean) => write(KEY_AUTH, v),
   hasOnboarded: () => read<boolean>(KEY_ONBOARD, false),

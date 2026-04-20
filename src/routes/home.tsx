@@ -1,37 +1,63 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight, CalendarPlus, Info } from "lucide-react";
+import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight, CalendarPlus, Info, Zap, Timer, CalendarClock } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { BrushingTimer } from "@/components/BrushingTimer";
 import { store } from "@/lib/store";
 
 export const Route = createFileRoute("/home")({
   component: Home,
 });
 
-const TIPS = [
-  "Replace your toothbrush every 3 months for the best clean.",
-  "Wait 30 minutes after acidic foods before brushing.",
-  "Use a soft-bristled brush to protect your enamel and gums.",
-  "Drinking water after meals helps wash away food particles.",
+const TIPS_MORNING = [
+  "Brush after breakfast to clear away overnight bacteria.",
+  "Start your day with a glass of water to rinse your mouth.",
   "Don't forget to brush your tongue — it harbors bacteria too.",
+];
+const TIPS_AFTERNOON = [
+  "Wait 30 minutes after acidic foods before brushing.",
+  "Drinking water after meals helps wash away food particles.",
+  "Chewing sugar-free gum boosts saliva and protects enamel.",
+];
+const TIPS_NIGHT = [
+  "Floss before sleep to remove plaque from between teeth.",
+  "Brush thoroughly before bed — saliva slows down at night.",
+  "Replace your toothbrush every 3 months for the best clean.",
 ];
 
 function Home() {
   const profile = store.getProfile();
   const results = store.getResults();
   const lastScore = results[0]?.score ?? 78;
+  const visits = store.getVisitReminders();
   const [tipIdx, setTipIdx] = useState(0);
+  const [showTimer, setShowTimer] = useState(false);
+
+  const hour = new Date().getHours();
+  const period = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "night";
+  const tipPool = period === "morning" ? TIPS_MORNING : period === "afternoon" ? TIPS_AFTERNOON : TIPS_NIGHT;
 
   useEffect(() => {
-    setTipIdx(Math.floor(Math.random() * TIPS.length));
-  }, []);
+    setTipIdx(Math.floor(Math.random() * tipPool.length));
+  }, [tipPool.length]);
+
+  // Dental timeline data
+  const timeline = useMemo(() => {
+    const last = results[0] ? new Date(results[0].date) : null;
+    const next = last ? new Date(last.getTime() + 90 * 86400000) : null; // ~3 months
+    const upcomingVisit = visits.find((v) => new Date(`${v.date}T${v.time}`) >= new Date());
+    const nextVisit = upcomingVisit ? new Date(`${upcomingVisit.date}T${upcomingVisit.time}`) : next;
+    const brushReplace = last ? new Date(last.getTime() + 90 * 86400000) : new Date(Date.now() + 90 * 86400000);
+    return { last, nextVisit, brushReplace };
+  }, [results, visits]);
+
+  const fmt = (d: Date | null) => d ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—";
 
   const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 18) return "Good afternoon";
+    if (period === "morning") return "Good morning";
+    if (period === "afternoon") return "Good afternoon";
     return "Good evening";
   })();
 
@@ -90,11 +116,53 @@ function Home() {
         </div>
         <div className="flex-1">
           <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Daily Tip</p>
-          <p className="text-sm mt-1 leading-relaxed">{TIPS[tipIdx]}</p>
+          <p className="text-sm mt-1 leading-relaxed">{tipPool[tipIdx]}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">{period} tip</p>
         </div>
       </motion.div>
 
-      {/* Quick actions */}
+      {/* Quick check + brushing timer */}
+      <div className="px-5 mt-4 grid grid-cols-2 gap-3">
+        <Link to="/assessment" className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 shadow-soft active:scale-[0.97] transition-transform flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <Zap className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm">Quick Check</p>
+            <p className="text-[11px] opacity-90">2-min assessment</p>
+          </div>
+        </Link>
+        <button onClick={() => setShowTimer(true)} className="rounded-2xl bg-card border border-border p-4 shadow-soft active:scale-[0.97] transition-transform flex items-center gap-3 text-left">
+          <div className="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center">
+            <Timer className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm">Brushing Timer</p>
+            <p className="text-[11px] text-muted-foreground">Start 2 min</p>
+          </div>
+        </button>
+      </div>
+
+      {/* Dental timeline */}
+      <div className="px-5 mt-6">
+        <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+          <CalendarClock className="h-4 w-4 text-primary" /> Dental Timeline
+        </h2>
+        <div className="rounded-2xl bg-card border border-border shadow-soft p-4 space-y-3">
+          {[
+            { label: "Last check", value: fmt(timeline.last) || "—", dot: "bg-success" },
+            { label: "Next visit", value: fmt(timeline.nextVisit), dot: "bg-primary" },
+            { label: "Replace brush", value: fmt(timeline.brushReplace), dot: "bg-warning" },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center gap-3">
+              <span className={`w-2.5 h-2.5 rounded-full ${row.dot}`} />
+              <span className="text-sm flex-1">{row.label}</span>
+              <span className="text-sm font-semibold tabular-nums">{row.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="px-5 mt-6">
         <h2 className="text-base font-semibold mb-3">Quick actions</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -161,6 +229,7 @@ function Home() {
           </div>
         </div>
       )}
+      <BrushingTimer open={showTimer} onClose={() => setShowTimer(false)} />
     </AppShell>
   );
 }

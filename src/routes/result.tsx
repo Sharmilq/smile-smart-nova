@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award, Info, TrendingUp, TrendingDown, Stethoscope, X, ListChecks } from "lucide-react";
+import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award, Info, TrendingUp, TrendingDown, Stethoscope, X, ListChecks, ShieldAlert, Share2, HeartPulse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { ShareReportSheet } from "@/components/ShareReportSheet";
+import { HelpTooltip } from "@/components/HelpTooltip";
 import { store } from "@/lib/store";
-import { getRecommendations, getBadges, getScoreReason, getScoreBreakdown, getImprovementPlan, shouldRecommendDentist } from "@/lib/assessment";
+import { getRecommendations, getBadges, getScoreReason, getScoreBreakdown, getImprovementPlan, shouldRecommendDentist, getRiskSummary } from "@/lib/assessment";
 
 export const Route = createFileRoute("/result")({
   validateSearch: (s: Record<string, unknown>) => ({ id: (s.id as string) || "" }),
@@ -19,6 +21,7 @@ function Result() {
   const result = allResults.find((r) => r.id === id) ?? allResults[0];
   const profile = store.getProfile();
   const [showReport, setShowReport] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   if (!result) {
     return (
@@ -38,6 +41,9 @@ function Result() {
   const reason = getScoreReason(result.answers);
   const plan = getImprovementPlan(result.answers);
   const dentist = shouldRecommendDentist(result.answers);
+  const risk = getRiskSummary(result.answers);
+  const strongConsult = result.answers[4] === "often" || (result.answers[4] === "sometimes" && result.answers[9] === "often");
+  const shareSummary = `🦷 DentNova Report\nScore: ${result.score}/100 (${result.level})\nRisk: ${risk.level}\n${reason}\nTop tips:\n${plan.slice(0,3).map(p=>`• ${p.text}`).join("\n")}`;
 
   const levelColor =
     result.level === "Good" ? "bg-success" : result.level === "Moderate" ? "bg-warning" : "bg-destructive";
@@ -75,7 +81,44 @@ function Result() {
           </div>
         </div>
 
-        {/* Compare with previous */}
+        {/* Oral Health Risk Summary */}
+        <section className="mt-4">
+          <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-primary" /> Oral Health Risk Summary
+          </h2>
+          <div className={`rounded-2xl border-2 p-4 shadow-soft ${
+            risk.tone === "good" ? "border-success/30 bg-success/5"
+            : risk.tone === "warn" ? "border-warning/40 bg-warning/5"
+            : "border-destructive/30 bg-destructive/5"
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className={`relative inline-flex w-3 h-3 rounded-full ${
+                risk.tone === "good" ? "bg-success" : risk.tone === "warn" ? "bg-warning" : "bg-destructive"
+              }`}>
+                <span className={`absolute inset-0 rounded-full animate-ping opacity-60 ${
+                  risk.tone === "good" ? "bg-success" : risk.tone === "warn" ? "bg-warning" : "bg-destructive"
+                }`} />
+              </span>
+              <p className="font-semibold text-sm">{risk.level} Risk</p>
+              <span className="ml-auto text-[11px] text-muted-foreground">{risk.concerns.length} {risk.concerns.length === 1 ? "concern" : "concerns"}</span>
+            </div>
+            {risk.concerns.length > 0 ? (
+              <ul className="mt-3 space-y-1.5">
+                {risk.concerns.map((c, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${
+                      c.severity === "good" ? "bg-success" : c.severity === "warn" ? "bg-warning" : "bg-destructive"
+                    }`} />
+                    <span className="text-base">{c.icon}</span>
+                    <span className={c.severity === "bad" ? "font-medium" : ""}>{c.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">No major concerns detected — keep it up! 🎉</p>
+            )}
+          </div>
+        </section>
         {delta !== null && previous && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
@@ -211,16 +254,44 @@ function Result() {
           </div>
         </section>
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        {/* Consultation advice */}
+        <section className={`mt-6 rounded-2xl p-4 border-2 ${
+          strongConsult ? "border-destructive/40 bg-destructive/5" : "border-primary/20 bg-primary/5"
+        }`}>
+          <div className="flex gap-3">
+            <div className={`rounded-full p-2 h-fit shrink-0 ${
+              strongConsult ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"
+            }`}>
+              <HeartPulse className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">
+                {strongConsult ? "Please consult a dentist soon" : "Consultation advice"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {strongConsult
+                  ? "Your symptoms (gum pain or frequent bleeding) need professional attention. Book a check-up."
+                  : "Consult a dentist if symptoms persist or worsen between visits."}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-6 grid grid-cols-3 gap-2.5">
           <Button variant="outline" className="h-12 rounded-xl active:scale-[0.97] transition-transform" onClick={() => setShowReport(true)}>
-            <Download className="h-4 w-4 mr-2" /> Report
+            <Download className="h-4 w-4 mr-1.5" /> Report
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl active:scale-[0.97] transition-transform" onClick={() => setShowShare(true)}>
+            <Share2 className="h-4 w-4 mr-1.5" /> Share
           </Button>
           <Link to="/assessment">
             <Button className="w-full h-12 rounded-xl bg-gradient-primary text-primary-foreground active:scale-[0.97] transition-transform">
-              <RefreshCw className="h-4 w-4 mr-2" /> Retake
+              <RefreshCw className="h-4 w-4 mr-1.5" /> Retake
             </Button>
           </Link>
         </div>
+
+        <ShareReportSheet open={showShare} onClose={() => setShowShare(false)} summary={shareSummary} />
       </div>
 
       {/* Download report modal (UI preview) */}
