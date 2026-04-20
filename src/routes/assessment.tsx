@@ -46,6 +46,8 @@ function Assessment() {
   const next = () => {
     if (step < QUESTIONS.length - 1) setStep(step + 1);
     else {
+      if (submittedRef.current) return;
+      submittedRef.current = true;
       const { score, level } = calcScore(answers);
       const id = Date.now().toString();
       store.addResult({ id, date: new Date().toISOString(), score, level, answers });
