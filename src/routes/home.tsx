@@ -22,16 +22,33 @@ function Home() {
   const profile = store.getProfile();
   const results = store.getResults();
   const lastScore = results[0]?.score ?? 78;
+  const visits = store.getVisitReminders();
   const [tipIdx, setTipIdx] = useState(0);
+  const [showTimer, setShowTimer] = useState(false);
+
+  const hour = new Date().getHours();
+  const period = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "night";
+  const tipPool = period === "morning" ? TIPS_MORNING : period === "afternoon" ? TIPS_AFTERNOON : TIPS_NIGHT;
 
   useEffect(() => {
-    setTipIdx(Math.floor(Math.random() * TIPS.length));
-  }, []);
+    setTipIdx(Math.floor(Math.random() * tipPool.length));
+  }, [tipPool.length]);
+
+  // Dental timeline data
+  const timeline = useMemo(() => {
+    const last = results[0] ? new Date(results[0].date) : null;
+    const next = last ? new Date(last.getTime() + 90 * 86400000) : null; // ~3 months
+    const upcomingVisit = visits.find((v) => new Date(`${v.date}T${v.time}`) >= new Date());
+    const nextVisit = upcomingVisit ? new Date(`${upcomingVisit.date}T${upcomingVisit.time}`) : next;
+    const brushReplace = last ? new Date(last.getTime() + 90 * 86400000) : new Date(Date.now() + 90 * 86400000);
+    return { last, nextVisit, brushReplace };
+  }, [results, visits]);
+
+  const fmt = (d: Date | null) => d ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—";
 
   const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 18) return "Good afternoon";
+    if (period === "morning") return "Good morning";
+    if (period === "afternoon") return "Good afternoon";
     return "Good evening";
   })();
 
@@ -90,7 +107,8 @@ function Home() {
         </div>
         <div className="flex-1">
           <p className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Daily Tip</p>
-          <p className="text-sm mt-1 leading-relaxed">{TIPS[tipIdx]}</p>
+          <p className="text-sm mt-1 leading-relaxed">{tipPool[tipIdx]}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">{period} tip</p>
         </div>
       </motion.div>
 
