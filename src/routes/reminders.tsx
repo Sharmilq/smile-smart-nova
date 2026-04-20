@@ -1,13 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, Plus, Trash2 } from "lucide-react";
+import { Bell, Plus, Trash2, Stethoscope, CalendarDays, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AppShell, PageHeader } from "@/components/AppShell";
-import { store, type Reminder } from "@/lib/store";
+import { store, type Reminder, type VisitReminder } from "@/lib/store";
+import { shouldRecommendDentist } from "@/lib/assessment";
 
 export const Route = createFileRoute("/reminders")({
   component: Reminders,
@@ -15,24 +16,51 @@ export const Route = createFileRoute("/reminders")({
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
+function formatVisit(v: VisitReminder) {
+  const d = new Date(`${v.date}T${v.time}`);
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function Reminders() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [visits, setVisits] = useState<VisitReminder[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newTime, setNewTime] = useState("08:00");
   const [newDays, setNewDays] = useState<string[]>([...DAYS]);
+  const [showDentistTip, setShowDentistTip] = useState(false);
 
-  useEffect(() => { setReminders(store.getReminders()); }, []);
+  useEffect(() => {
+    setReminders(store.getReminders());
+    setVisits(store.getVisitReminders());
+    const last = store.getResults()[0];
+    if (last && shouldRecommendDentist(last.answers)) {
+      setShowDentistTip(true);
+    }
+  }, []);
 
   const update = (next: Reminder[]) => { setReminders(next); store.setReminders(next); };
   const toggle = (id: string) => update(reminders.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
   const remove = (id: string) => update(reminders.filter(r => r.id !== id));
+  const removeVisit = (id: string) => {
+    store.removeVisitReminder(id);
+    setVisits(store.getVisitReminders());
+  };
   const toggleDay = (d: string) => setNewDays(p => p.includes(d) ? p.filter(x => x !== d) : [...p, d]);
   const add = () => {
     if (!newLabel) return;
     update([...reminders, { id: Date.now().toString(), label: newLabel, time: newTime, days: newDays, enabled: true }]);
     setShowAdd(false); setNewLabel(""); setNewTime("08:00"); setNewDays([...DAYS]);
   };
+
+  const now = new Date();
+  const upcoming = visits.filter(v => new Date(`${v.date}T${v.time}`) >= now);
+  const past = visits.filter(v => new Date(`${v.date}T${v.time}`) < now);
 
   return (
     <AppShell>
@@ -50,6 +78,73 @@ function Reminders() {
             <p className="font-semibold">Time to brush! Keep your smile healthy 😊</p>
             <p className="text-xs text-muted-foreground">Includes a 3-month toothbrush replacement reminder.</p>
           </div>
+        </div>
+
+        {/* Smart suggestion */}
+        {showDentistTip && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 rounded-2xl border-2 border-warning/40 bg-warning/10 p-4 flex gap-3"
+          >
+            <div className="rounded-full bg-warning/20 text-warning p-2 h-fit shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">Consider scheduling a dental visit soon</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Your last assessment showed signs that may need professional care.
+              </p>
+              <Link to="/visit-reminder">
+                <Button size="sm" className="mt-2 h-8 rounded-lg bg-warning text-white hover:bg-warning/90">
+                  Set visit reminder
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Dental visits section */}
+        <div className="mt-6 flex items-center justify-between">
+          <h2 className="text-base font-semibold flex items-center gap-2">
+            <Stethoscope className="h-4 w-4 text-primary" /> Dental visits
+          </h2>
+          <Link to="/visit-reminder" className="text-xs font-semibold text-primary">+ Add</Link>
+        </div>
+        <div className="mt-3 space-y-2">
+          {upcoming.length === 0 && past.length === 0 && (
+            <Link to="/visit-reminder" className="block rounded-2xl border-2 border-dashed border-border p-4 text-center text-sm text-muted-foreground active:scale-[0.99] transition-transform">
+              No dental visits scheduled. Tap to set one.
+            </Link>
+          )}
+          {upcoming.map(v => (
+            <div key={v.id} className="rounded-2xl bg-card border border-border p-4 shadow-soft flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <CalendarDays className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{v.note || "Dental Checkup"}</p>
+                <p className="text-xs text-primary font-medium mt-0.5">{formatVisit(v)}</p>
+              </div>
+              <button onClick={() => removeVisit(v.id)} className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+          {past.map(v => (
+            <div key={v.id} className="rounded-2xl bg-muted/40 border border-border p-4 flex items-start gap-3 opacity-70">
+              <div className="w-10 h-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+                <CalendarDays className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{v.note || "Dental Checkup"}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{formatVisit(v)} · past</p>
+              </div>
+              <button onClick={() => removeVisit(v.id)} className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
         </div>
 
         {showAdd && (
@@ -82,7 +177,7 @@ function Reminders() {
           </motion.div>
         )}
 
-        <h2 className="text-base font-semibold mt-6 mb-3">Your reminders</h2>
+        <h2 className="text-base font-semibold mt-6 mb-3">Daily reminders</h2>
         <div className="space-y-3">
           {reminders.map(r => (
             <div key={r.id} className="rounded-2xl bg-card border border-border p-4 shadow-soft">
