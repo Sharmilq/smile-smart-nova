@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User } from "lucide-react";
+import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User, Flame, TrendingUp } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { ScoreChart } from "@/components/ScoreChart";
 import { store } from "@/lib/store";
 
 export const Route = createFileRoute("/profile")({
