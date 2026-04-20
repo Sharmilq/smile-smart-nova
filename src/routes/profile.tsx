@@ -14,6 +14,10 @@ function Profile() {
   const profile = store.getProfile();
   const results = store.getResults();
   const lastScore = results[0]?.score ?? 0;
+  const streak = store.getStreak();
+  const achievements = store.getAchievements();
+  // chronological oldest -> newest, capped to last 10
+  const chartScores = [...results].slice(0, 10).reverse().map(r => r.score);
 
   const logout = () => {
     store.setAuthed(false);
