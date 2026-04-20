@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
 import { store } from "@/lib/store";
-import { getRecommendations } from "@/lib/assessment";
+import { getRecommendations, getBadges } from "@/lib/assessment";
 
 export const Route = createFileRoute("/result")({
   validateSearch: (s: Record<string, unknown>) => ({ id: (s.id as string) || "" }),
