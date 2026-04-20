@@ -6,6 +6,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { QUESTIONS, calcScore } from "@/lib/assessment";
+import { HelpTooltip } from "@/components/HelpTooltip";
+
+const HELP_TOPICS: Record<number, { title: string; text: string }> = {
+  3: { title: "Plaque", text: "Plaque is a sticky film of bacteria that forms on teeth. If not removed by brushing and flossing, it hardens into tartar and causes cavities and gum disease." },
+  4: { title: "Gum bleeding", text: "Gums that bleed when brushing often signal early gum disease (gingivitis). Switch to a soft brush, floss daily, and book a check-up if it persists." },
+  5: { title: "Tooth sensitivity", text: "Sharp pain from cold, hot, or sweet foods usually means worn enamel or exposed roots. Use a desensitizing toothpaste and avoid hard brushing." },
+};
 
 const ENCOURAGEMENTS = [
   "Great! You're maintaining good dental habits 👏",
@@ -79,7 +86,10 @@ function Assessment() {
             className="mt-8"
           >
             <div className="text-5xl mb-3">{q.icon}</div>
-            <h2 className="text-xl font-bold leading-snug">{q.title}</h2>
+            <div className="flex items-start gap-2">
+              <h2 className="text-xl font-bold leading-snug flex-1">{q.title}</h2>
+              {HELP_TOPICS[q.id] && <div className="mt-1.5"><HelpTooltip title={HELP_TOPICS[q.id].title} text={HELP_TOPICS[q.id].text} /></div>}
+            </div>
 
             <div className="mt-6 space-y-2.5">
               {q.options.map((o) => {
