@@ -23,6 +23,7 @@ function Scan() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [progress, setProgress] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -78,12 +79,13 @@ function Scan() {
             </div>
 
             <div className="mt-6 space-y-3">
-              <Button onClick={() => fileRef.current?.click()} className="w-full h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-soft">
+              <Button onClick={() => cameraRef.current?.click()} className="w-full h-14 rounded-2xl bg-gradient-primary text-primary-foreground shadow-soft">
                 <Camera className="h-5 w-5 mr-2" /> Open Camera
               </Button>
               <Button onClick={() => fileRef.current?.click()} variant="outline" className="w-full h-14 rounded-2xl border-2">
                 <Upload className="h-5 w-5 mr-2" /> Upload from gallery
               </Button>
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} />
             </div>
 
