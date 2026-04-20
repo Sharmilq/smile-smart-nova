@@ -121,7 +121,48 @@ function Home() {
         </div>
       </motion.div>
 
-      {/* Quick actions */}
+      {/* Quick check + brushing timer */}
+      <div className="px-5 mt-4 grid grid-cols-2 gap-3">
+        <Link to="/assessment" className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 shadow-soft active:scale-[0.97] transition-transform flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <Zap className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm">Quick Check</p>
+            <p className="text-[11px] opacity-90">2-min assessment</p>
+          </div>
+        </Link>
+        <button onClick={() => setShowTimer(true)} className="rounded-2xl bg-card border border-border p-4 shadow-soft active:scale-[0.97] transition-transform flex items-center gap-3 text-left">
+          <div className="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center">
+            <Timer className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm">Brushing Timer</p>
+            <p className="text-[11px] text-muted-foreground">Start 2 min</p>
+          </div>
+        </button>
+      </div>
+
+      {/* Dental timeline */}
+      <div className="px-5 mt-6">
+        <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+          <CalendarClock className="h-4 w-4 text-primary" /> Dental Timeline
+        </h2>
+        <div className="rounded-2xl bg-card border border-border shadow-soft p-4 space-y-3">
+          {[
+            { label: "Last check", value: fmt(timeline.last) || "—", dot: "bg-success" },
+            { label: "Next visit", value: fmt(timeline.nextVisit), dot: "bg-primary" },
+            { label: "Replace brush", value: fmt(timeline.brushReplace), dot: "bg-warning" },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center gap-3">
+              <span className={`w-2.5 h-2.5 rounded-full ${row.dot}`} />
+              <span className="text-sm flex-1">{row.label}</span>
+              <span className="text-sm font-semibold tabular-nums">{row.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="px-5 mt-6">
         <h2 className="text-base font-semibold mb-3">Quick actions</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -188,6 +229,7 @@ function Home() {
           </div>
         </div>
       )}
+      <BrushingTimer open={showTimer} onClose={() => setShowTimer(false)} />
     </AppShell>
   );
 }
