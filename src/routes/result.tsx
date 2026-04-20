@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award, Info, TrendingUp, TrendingDown, Stethoscope, X, ListChecks } from "lucide-react";
+import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award, Info, TrendingUp, TrendingDown, Stethoscope, X, ListChecks, ShieldAlert, Share2, HeartPulse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { ShareReportSheet } from "@/components/ShareReportSheet";
+import { HelpTooltip } from "@/components/HelpTooltip";
 import { store } from "@/lib/store";
-import { getRecommendations, getBadges, getScoreReason, getScoreBreakdown, getImprovementPlan, shouldRecommendDentist } from "@/lib/assessment";
+import { getRecommendations, getBadges, getScoreReason, getScoreBreakdown, getImprovementPlan, shouldRecommendDentist, getRiskSummary } from "@/lib/assessment";
 
 export const Route = createFileRoute("/result")({
   validateSearch: (s: Record<string, unknown>) => ({ id: (s.id as string) || "" }),
@@ -19,6 +21,7 @@ function Result() {
   const result = allResults.find((r) => r.id === id) ?? allResults[0];
   const profile = store.getProfile();
   const [showReport, setShowReport] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   if (!result) {
     return (
@@ -38,6 +41,9 @@ function Result() {
   const reason = getScoreReason(result.answers);
   const plan = getImprovementPlan(result.answers);
   const dentist = shouldRecommendDentist(result.answers);
+  const risk = getRiskSummary(result.answers);
+  const strongConsult = result.answers[4] === "often" || (result.answers[4] === "sometimes" && result.answers[9] === "often");
+  const shareSummary = `🦷 DentNova Report\nScore: ${result.score}/100 (${result.level})\nRisk: ${risk.level}\n${reason}\nTop tips:\n${plan.slice(0,3).map(p=>`• ${p.text}`).join("\n")}`;
 
   const levelColor =
     result.level === "Good" ? "bg-success" : result.level === "Moderate" ? "bg-warning" : "bg-destructive";
