@@ -1,21 +1,30 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight, CalendarPlus, Info } from "lucide-react";
+import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight, CalendarPlus, Info, Zap, Timer, CalendarClock } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { BrushingTimer } from "@/components/BrushingTimer";
 import { store } from "@/lib/store";
 
 export const Route = createFileRoute("/home")({
   component: Home,
 });
 
-const TIPS = [
-  "Replace your toothbrush every 3 months for the best clean.",
-  "Wait 30 minutes after acidic foods before brushing.",
-  "Use a soft-bristled brush to protect your enamel and gums.",
-  "Drinking water after meals helps wash away food particles.",
+const TIPS_MORNING = [
+  "Brush after breakfast to clear away overnight bacteria.",
+  "Start your day with a glass of water to rinse your mouth.",
   "Don't forget to brush your tongue — it harbors bacteria too.",
+];
+const TIPS_AFTERNOON = [
+  "Wait 30 minutes after acidic foods before brushing.",
+  "Drinking water after meals helps wash away food particles.",
+  "Chewing sugar-free gum boosts saliva and protects enamel.",
+];
+const TIPS_NIGHT = [
+  "Floss before sleep to remove plaque from between teeth.",
+  "Brush thoroughly before bed — saliva slows down at night.",
+  "Replace your toothbrush every 3 months for the best clean.",
 ];
 
 function Home() {
