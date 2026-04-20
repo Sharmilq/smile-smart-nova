@@ -17,8 +17,31 @@ function Profile() {
   const lastScore = results[0]?.score ?? 0;
   const streak = store.getStreak();
   const achievements = store.getAchievements();
+  const visits = store.getVisitReminders();
   // chronological oldest -> newest, capped to last 10
   const chartScores = [...results].slice(0, 10).reverse().map(r => r.score);
+
+  const [today, setToday] = useState<HabitDay>({ date: "", brush: false, floss: false });
+  const [brushStreak, setBrushStreak] = useState(0);
+  const [flossStreak, setFlossStreak] = useState(0);
+  useEffect(() => {
+    setToday(store.getTodayHabit());
+    setBrushStreak(store.getHabitStreak("brush"));
+    setFlossStreak(store.getHabitStreak("floss"));
+  }, []);
+  const toggleHabit = (k: "brush" | "floss") => {
+    store.toggleHabit(k);
+    setToday(store.getTodayHabit());
+    setBrushStreak(store.getHabitStreak("brush"));
+    setFlossStreak(store.getHabitStreak("floss"));
+  };
+
+  // Dental timeline
+  const lastDate = results[0] ? new Date(results[0].date) : null;
+  const upcomingVisit = visits.find((v) => new Date(`${v.date}T${v.time}`) >= new Date());
+  const nextVisit = upcomingVisit ? new Date(`${upcomingVisit.date}T${upcomingVisit.time}`) : (lastDate ? new Date(lastDate.getTime() + 90*86400000) : null);
+  const replaceBrush = lastDate ? new Date(lastDate.getTime() + 90*86400000) : new Date(Date.now() + 90*86400000);
+  const fmt = (d: Date | null) => d ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—";
 
   const logout = () => {
     store.setAuthed(false);
