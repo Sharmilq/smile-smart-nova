@@ -26,6 +26,7 @@ function Assessment() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<AssessmentAnswers>({});
   const [warn, setWarn] = useState<string | null>(null);
+  const submittedRef = useRef(false);
 
   const q = QUESTIONS[step];
   const progress = ((step + 1) / QUESTIONS.length) * 100;
