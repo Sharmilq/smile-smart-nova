@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User, Flame, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User, Flame, TrendingUp, ShieldCheck, CalendarClock, Check } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
 import { ScoreChart } from "@/components/ScoreChart";
-import { store } from "@/lib/store";
+import { store, type HabitDay } from "@/lib/store";
 
 export const Route = createFileRoute("/profile")({
   component: Profile,
