@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, AlertTriangle, X } from "lucide-react";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ function Assessment() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<AssessmentAnswers>({});
   const [warn, setWarn] = useState<string | null>(null);
+  const submittedRef = useRef(false);
 
   const q = QUESTIONS[step];
   const progress = ((step + 1) / QUESTIONS.length) * 100;
@@ -45,6 +46,8 @@ function Assessment() {
   const next = () => {
     if (step < QUESTIONS.length - 1) setStep(step + 1);
     else {
+      if (submittedRef.current) return;
+      submittedRef.current = true;
       const { score, level } = calcScore(answers);
       const id = Date.now().toString();
       store.addResult({ id, date: new Date().toISOString(), score, level, answers });
