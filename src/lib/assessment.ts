@@ -150,10 +150,91 @@ export function getRecommendations(answers: AssessmentAnswers): { issues: string
       issues.push(opt.warn);
     }
   }
-  tips.push("Brush twice daily for 2 minutes with fluoride toothpaste.");
-  tips.push("Floss at least once a day to remove plaque between teeth.");
-  tips.push("Limit sugary snacks and drinks; rinse with water after.");
-  tips.push("Visit your dentist every 6 months for a checkup and cleaning.");
-  tips.push("Stay hydrated and consider chewing sugar-free gum after meals.");
+
+  // Personalized smart suggestions based on specific answers
+  const smart: string[] = [];
+  if (answers[1] === "once" || answers[1] === "sometimes" || answers[1] === "rarely") {
+    smart.push("Brush at least twice daily — morning and before bed.");
+  }
+  if (answers[3] === "rarely" || answers[3] === "never") {
+    smart.push("Add daily flossing to your routine for healthier gums.");
+  }
+  if (answers[4] === "sometimes" || answers[4] === "often") {
+    smart.push("Bleeding gums detected — consider booking a dental consultation.");
+  }
+  if (answers[6] === "daily" || answers[6] === "multi") {
+    smart.push("Cut back on sugar and rinse with water after sweets.");
+  }
+  if (answers[7] === "occasional" || answers[7] === "daily") {
+    smart.push("Tobacco harms your gums and stains teeth — quitting helps fast.");
+  }
+  if (answers[2] === "less" || answers[2] === "1min") {
+    smart.push("Use a soft-bristled brush and aim for the full 2 minutes.");
+  }
+  if (answers[8] === "2y" || answers[8] === "more") {
+    smart.push("Schedule a dental checkup — early detection prevents bigger issues.");
+  }
+  if (answers[11] === "less") {
+    smart.push("Drink more water daily to wash away food and bacteria.");
+  }
+
+  // Generic best-practice tips fill the rest
+  const generic = [
+    "Brush twice daily for 2 minutes with fluoride toothpaste.",
+    "Floss at least once a day to remove plaque between teeth.",
+    "Limit sugary snacks and drinks; rinse with water after.",
+    "Visit your dentist every 6 months for a checkup and cleaning.",
+    "Stay hydrated and consider chewing sugar-free gum after meals.",
+  ];
+  for (const t of [...smart, ...generic]) {
+    if (tips.length >= 6) break;
+    if (!tips.includes(t)) tips.push(t);
+  }
+
   return { issues: issues.slice(0, 5), tips };
+}
+
+export interface RiskBadge {
+  label: string;
+  tone: "good" | "warn" | "bad";
+  icon: string;
+}
+
+export function getBadges(answers: AssessmentAnswers): RiskBadge[] {
+  const badges: RiskBadge[] = [];
+  // Brushing habit
+  if (answers[1] === "twice" && (answers[2] === "2min")) {
+    badges.push({ label: "Good Brushing Habit", tone: "good", icon: "🪥" });
+  } else if (answers[1] === "rarely" || answers[1] === "sometimes") {
+    badges.push({ label: "Inconsistent Brushing", tone: "bad", icon: "🪥" });
+  }
+  // Flossing
+  if (answers[3] === "daily") {
+    badges.push({ label: "Floss Pro", tone: "good", icon: "🧵" });
+  }
+  // Sugar
+  if (answers[6] === "daily" || answers[6] === "multi") {
+    badges.push({ label: "High Sugar Intake", tone: "bad", icon: "🍬" });
+  }
+  // Gum sensitivity
+  if (answers[4] === "sometimes" || answers[4] === "often") {
+    badges.push({ label: "Gum Sensitivity", tone: "warn", icon: "🩸" });
+  }
+  // Tooth sensitivity
+  if (answers[5] === "moderate" || answers[5] === "severe") {
+    badges.push({ label: "Tooth Sensitivity", tone: "warn", icon: "❄️" });
+  }
+  // Tobacco
+  if (answers[7] === "occasional" || answers[7] === "daily") {
+    badges.push({ label: "Tobacco Use", tone: "bad", icon: "🚬" });
+  }
+  // Hydration
+  if (answers[11] === "8") {
+    badges.push({ label: "Well Hydrated", tone: "good", icon: "💧" });
+  }
+  // Recent checkup
+  if (answers[8] === "6m") {
+    badges.push({ label: "Up-to-date Checkup", tone: "good", icon: "🦷" });
+  }
+  return badges.slice(0, 6);
 }

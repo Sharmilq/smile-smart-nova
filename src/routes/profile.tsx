@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User } from "lucide-react";
+import { Settings, Edit3, MessageSquare, LogOut, ChevronRight, User, Flame, TrendingUp } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
+import { ScoreChart } from "@/components/ScoreChart";
 import { store } from "@/lib/store";
 
 export const Route = createFileRoute("/profile")({
@@ -13,6 +14,10 @@ function Profile() {
   const profile = store.getProfile();
   const results = store.getResults();
   const lastScore = results[0]?.score ?? 0;
+  const streak = store.getStreak();
+  const achievements = store.getAchievements();
+  // chronological oldest -> newest, capped to last 10
+  const chartScores = [...results].slice(0, 10).reverse().map(r => r.score);
 
   const logout = () => {
     store.setAuthed(false);
@@ -55,6 +60,44 @@ function Profile() {
             <p className="text-xs text-muted-foreground mt-1">{results.length} assessment{results.length !== 1 ? "s" : ""} completed</p>
           </div>
         </div>
+
+        {/* Streak */}
+        <div className="mt-4 rounded-3xl bg-gradient-hero p-4 flex items-center gap-3 shadow-soft">
+          <div className="rounded-2xl bg-card p-3 shadow-soft">
+            <Flame className={`h-6 w-6 ${streak > 0 ? "text-warning" : "text-muted-foreground"}`} />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-lg leading-tight">{streak}-day streak {streak > 0 ? "🔥" : ""}</p>
+            <p className="text-xs text-muted-foreground">{streak > 0 ? "Healthy habits in motion — keep going!" : "Complete an assessment today to start a streak."}</p>
+          </div>
+        </div>
+
+        {/* Achievements */}
+        <h2 className="text-base font-semibold mt-6 mb-3">Achievements</h2>
+        <div className="grid grid-cols-2 gap-2.5">
+          {achievements.map(a => (
+            <div key={a.id} className={`rounded-2xl border p-3 flex items-center gap-2.5 shadow-soft ${a.earned ? "bg-card border-primary/30" : "bg-muted/40 border-border opacity-60"}`}>
+              <div className="text-2xl">{a.icon}</div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{a.label}</p>
+                <p className="text-[11px] text-muted-foreground">{a.earned ? "Earned" : "Locked"}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Progress chart */}
+        {chartScores.length >= 2 && (
+          <div className="mt-6 rounded-3xl bg-card border border-border p-4 shadow-soft">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" /> Progress over time
+              </h2>
+              <span className="text-xs text-muted-foreground">last {chartScores.length}</span>
+            </div>
+            <ScoreChart scores={chartScores} />
+          </div>
+        )}
 
         {/* History */}
         <h2 className="text-base font-semibold mt-6 mb-3">Past assessments</h2>

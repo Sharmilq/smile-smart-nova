@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
 import { store } from "@/lib/store";
-import { getRecommendations } from "@/lib/assessment";
+import { getRecommendations, getBadges } from "@/lib/assessment";
 
 export const Route = createFileRoute("/result")({
   validateSearch: (s: Record<string, unknown>) => ({ id: (s.id as string) || "" }),
@@ -26,6 +26,7 @@ function Result() {
   }
 
   const { issues, tips } = getRecommendations(result.answers);
+  const badges = getBadges(result.answers);
   const levelColor =
     result.level === "Good" ? "bg-success" : result.level === "Moderate" ? "bg-warning" : "bg-destructive";
 
@@ -52,6 +53,32 @@ function Result() {
             {result.level.toUpperCase()}
           </span>
         </motion.div>
+
+        {badges.length > 0 && (
+          <section className="mt-6">
+            <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+              <Award className="h-4 w-4 text-primary" /> Risk indicators
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((b, i) => {
+                const tone =
+                  b.tone === "good"
+                    ? "bg-success/15 text-success border-success/30"
+                    : b.tone === "warn"
+                      ? "bg-warning/15 text-warning border-warning/40"
+                      : "bg-destructive/15 text-destructive border-destructive/30";
+                return (
+                  <span
+                    key={i}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${tone}`}
+                  >
+                    <span>{b.icon}</span> {b.label}
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {issues.length > 0 && (
           <section className="mt-6">

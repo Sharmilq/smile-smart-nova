@@ -47,8 +47,8 @@ function Reminders() {
             <Bell className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <p className="font-semibold">Stay consistent</p>
-            <p className="text-xs text-muted-foreground">Schedule daily care reminders to build healthy habits.</p>
+            <p className="font-semibold">Time to brush! Keep your smile healthy 😊</p>
+            <p className="text-xs text-muted-foreground">Includes a 3-month toothbrush replacement reminder.</p>
           </div>
         </div>
 
