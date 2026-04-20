@@ -25,6 +25,7 @@ const KEY_RESULTS = "dn_results";
 const KEY_REMINDERS = "dn_reminders";
 const KEY_AUTH = "dn_auth";
 const KEY_ONBOARD = "dn_onboard";
+const KEY_VISITS = "dn_visit_reminders";
 
 export interface Reminder {
   id: string;
@@ -32,6 +33,14 @@ export interface Reminder {
   time: string;
   days: string[];
   enabled: boolean;
+}
+
+export interface VisitReminder {
+  id: string;
+  date: string; // ISO yyyy-mm-dd
+  time: string; // HH:mm
+  note?: string;
+  createdAt: string;
 }
 
 const isBrowser = () => typeof window !== "undefined";
@@ -88,6 +97,19 @@ export const store = {
     return list;
   },
   setReminders: (r: Reminder[]) => write(KEY_REMINDERS, r),
+  getVisitReminders: () => {
+    const all = read<VisitReminder[]>(KEY_VISITS, []);
+    // Sort upcoming first
+    return [...all].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  },
+  addVisitReminder: (v: VisitReminder) => {
+    const all = read<VisitReminder[]>(KEY_VISITS, []);
+    write(KEY_VISITS, [v, ...all]);
+  },
+  removeVisitReminder: (id: string) => {
+    const all = read<VisitReminder[]>(KEY_VISITS, []);
+    write(KEY_VISITS, all.filter(v => v.id !== id));
+  },
   isAuthed: () => read<boolean>(KEY_AUTH, false),
   setAuthed: (v: boolean) => write(KEY_AUTH, v),
   hasOnboarded: () => read<boolean>(KEY_ONBOARD, false),

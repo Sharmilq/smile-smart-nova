@@ -113,9 +113,9 @@ function Result() {
               <p className="text-xs text-muted-foreground mt-0.5">
                 Your answers indicate signs that benefit from a professional check-up.
               </p>
-              <Link to="/appointment">
+              <Link to="/visit-reminder">
                 <Button size="sm" className="mt-2 h-8 rounded-lg bg-warning text-white hover:bg-warning/90">
-                  Book appointment
+                  Set visit reminder
                 </Button>
               </Link>
             </div>
