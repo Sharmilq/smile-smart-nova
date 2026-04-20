@@ -283,6 +283,36 @@ export interface RiskBadge {
   icon: string;
 }
 
+export interface RiskSummary {
+  level: "Low" | "Moderate" | "High";
+  tone: "good" | "warn" | "bad";
+  concerns: { label: string; icon: string; severity: "good" | "warn" | "bad" }[];
+}
+
+export function getRiskSummary(answers: AssessmentAnswers): RiskSummary {
+  const concerns: RiskSummary["concerns"] = [];
+  if (answers[4] === "often") concerns.push({ label: "Frequent gum bleeding", icon: "🩸", severity: "bad" });
+  else if (answers[4] === "sometimes") concerns.push({ label: "Gum sensitivity", icon: "🩸", severity: "warn" });
+  if (answers[5] === "severe") concerns.push({ label: "Severe tooth sensitivity", icon: "❄️", severity: "bad" });
+  else if (answers[5] === "moderate") concerns.push({ label: "Tooth sensitivity", icon: "❄️", severity: "warn" });
+  if (answers[6] === "multi") concerns.push({ label: "Very high sugar intake", icon: "🍬", severity: "bad" });
+  else if (answers[6] === "daily") concerns.push({ label: "High sugar intake", icon: "🍬", severity: "warn" });
+  if (answers[7] === "daily") concerns.push({ label: "Daily tobacco use", icon: "🚬", severity: "bad" });
+  else if (answers[7] === "occasional") concerns.push({ label: "Occasional tobacco use", icon: "🚬", severity: "warn" });
+  if (answers[1] === "rarely") concerns.push({ label: "Irregular brushing", icon: "🪥", severity: "bad" });
+  else if (answers[1] === "sometimes") concerns.push({ label: "Inconsistent brushing", icon: "🪥", severity: "warn" });
+  if (answers[3] === "never") concerns.push({ label: "No flossing", icon: "🧵", severity: "bad" });
+  if (answers[8] === "more") concerns.push({ label: "Overdue dental check-up", icon: "🦷", severity: "bad" });
+
+  const bad = concerns.filter((c) => c.severity === "bad").length;
+  const warn = concerns.filter((c) => c.severity === "warn").length;
+  let level: RiskSummary["level"] = "Low";
+  let tone: RiskSummary["tone"] = "good";
+  if (bad >= 2 || (bad >= 1 && warn >= 2)) { level = "High"; tone = "bad"; }
+  else if (bad >= 1 || warn >= 2) { level = "Moderate"; tone = "warn"; }
+  return { level, tone, concerns: concerns.slice(0, 6) };
+}
+
 export function getBadges(answers: AssessmentAnswers): RiskBadge[] {
   const badges: RiskBadge[] = [];
   // Brushing habit
