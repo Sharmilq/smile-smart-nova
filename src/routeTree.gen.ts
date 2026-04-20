@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VisitReminderRouteImport } from './routes/visit-reminder'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as ResultRouteImport } from './routes/result'
@@ -24,11 +25,15 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as AssessmentRouteImport } from './routes/assessment'
-import { Route as AppointmentRouteImport } from './routes/appointment'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EducationIndexRouteImport } from './routes/education.index'
 import { Route as EducationSlugRouteImport } from './routes/education.$slug'
 
+const VisitReminderRoute = VisitReminderRouteImport.update({
+  id: '/visit-reminder',
+  path: '/visit-reminder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -104,11 +109,6 @@ const AssessmentRoute = AssessmentRouteImport.update({
   path: '/assessment',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppointmentRoute = AppointmentRouteImport.update({
-  id: '/appointment',
-  path: '/appointment',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -127,7 +127,6 @@ const EducationSlugRoute = EducationSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
@@ -143,12 +142,12 @@ export interface FileRoutesByFullPath {
   '/result': typeof ResultRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/visit-reminder': typeof VisitReminderRoute
   '/education/$slug': typeof EducationSlugRoute
   '/education/': typeof EducationIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
@@ -164,13 +163,13 @@ export interface FileRoutesByTo {
   '/result': typeof ResultRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/visit-reminder': typeof VisitReminderRoute
   '/education/$slug': typeof EducationSlugRoute
   '/education': typeof EducationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
@@ -186,6 +185,7 @@ export interface FileRoutesById {
   '/result': typeof ResultRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
+  '/visit-reminder': typeof VisitReminderRoute
   '/education/$slug': typeof EducationSlugRoute
   '/education/': typeof EducationIndexRoute
 }
@@ -193,7 +193,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
@@ -209,12 +208,12 @@ export interface FileRouteTypes {
     | '/result'
     | '/scan'
     | '/settings'
+    | '/visit-reminder'
     | '/education/$slug'
     | '/education/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
@@ -230,12 +229,12 @@ export interface FileRouteTypes {
     | '/result'
     | '/scan'
     | '/settings'
+    | '/visit-reminder'
     | '/education/$slug'
     | '/education'
   id:
     | '__root__'
     | '/'
-    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
@@ -251,13 +250,13 @@ export interface FileRouteTypes {
     | '/result'
     | '/scan'
     | '/settings'
+    | '/visit-reminder'
     | '/education/$slug'
     | '/education/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppointmentRoute: typeof AppointmentRoute
   AssessmentRoute: typeof AssessmentRoute
   EditProfileRoute: typeof EditProfileRoute
   FeedbackRoute: typeof FeedbackRoute
@@ -273,12 +272,20 @@ export interface RootRouteChildren {
   ResultRoute: typeof ResultRoute
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
+  VisitReminderRoute: typeof VisitReminderRoute
   EducationSlugRoute: typeof EducationSlugRoute
   EducationIndexRoute: typeof EducationIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visit-reminder': {
+      id: '/visit-reminder'
+      path: '/visit-reminder'
+      fullPath: '/visit-reminder'
+      preLoaderRoute: typeof VisitReminderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -384,13 +391,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/appointment': {
-      id: '/appointment'
-      path: '/appointment'
-      fullPath: '/appointment'
-      preLoaderRoute: typeof AppointmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -417,7 +417,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppointmentRoute: AppointmentRoute,
   AssessmentRoute: AssessmentRoute,
   EditProfileRoute: EditProfileRoute,
   FeedbackRoute: FeedbackRoute,
@@ -433,9 +432,19 @@ const rootRouteChildren: RootRouteChildren = {
   ResultRoute: ResultRoute,
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,
+  VisitReminderRoute: VisitReminderRoute,
   EducationSlugRoute: EducationSlugRoute,
   EducationIndexRoute: EducationIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

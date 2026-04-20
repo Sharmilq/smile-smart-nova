@@ -122,13 +122,13 @@ function Home() {
 
       {/* Secondary actions */}
       <div className="px-5 mt-6 grid grid-cols-2 gap-3">
-        <Link to="/appointment" className="rounded-2xl bg-card border border-border p-4 shadow-soft hover:shadow-card transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center gap-3">
+        <Link to="/visit-reminder" className="rounded-2xl bg-card border border-border p-4 shadow-soft hover:shadow-card transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 to-pink-500 text-white flex items-center justify-center shadow-soft">
             <CalendarPlus className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-sm">Book visit</p>
-            <p className="text-[11px] text-muted-foreground">Find a slot</p>
+            <p className="font-semibold text-sm">Visit reminder</p>
+            <p className="text-[11px] text-muted-foreground">Schedule a checkup</p>
           </div>
         </Link>
         <Link to="/how-it-works" className="rounded-2xl bg-card border border-border p-4 shadow-soft hover:shadow-card transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center gap-3">
