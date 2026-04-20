@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight } from "lucide-react";
+import { ClipboardCheck, ScanLine, BookOpen, Bell, User, Lightbulb, ChevronRight, CalendarPlus, Info } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScoreRing } from "@/components/ScoreRing";
 import { store } from "@/lib/store";
