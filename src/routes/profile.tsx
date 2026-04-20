@@ -96,7 +96,52 @@ function Profile() {
           </div>
         </div>
 
-        {/* Achievements */}
+        {/* Habit tracker */}
+        <h2 className="text-base font-semibold mt-6 mb-3">Today's habits</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { kind: "brush" as const, label: "Brush", icon: "🪥", done: today.brush, streak: brushStreak },
+            { kind: "floss" as const, label: "Floss", icon: "🧵", done: today.floss, streak: flossStreak },
+          ]).map((h) => (
+            <button
+              key={h.kind}
+              onClick={() => toggleHabit(h.kind)}
+              className={`rounded-2xl border-2 p-4 text-left active:scale-[0.97] transition-transform shadow-soft ${
+                h.done ? "bg-success/10 border-success/40" : "bg-card border-border"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-2xl">{h.icon}</span>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  h.done ? "bg-success text-white" : "bg-muted text-muted-foreground"
+                }`}>
+                  {h.done && <Check className="h-3.5 w-3.5" />}
+                </span>
+              </div>
+              <p className="font-semibold text-sm mt-2">{h.label}</p>
+              <p className="text-[11px] text-muted-foreground">{h.done ? "Completed" : "Pending"} · {h.streak}🔥</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Dental timeline */}
+        <h2 className="text-base font-semibold mt-6 mb-3 flex items-center gap-2">
+          <CalendarClock className="h-4 w-4 text-primary" /> Dental Timeline
+        </h2>
+        <div className="rounded-2xl bg-card border border-border shadow-soft p-4 space-y-3">
+          {[
+            { label: "Last assessment", value: fmt(lastDate), dot: "bg-success" },
+            { label: "Next dental visit", value: fmt(nextVisit), dot: "bg-primary" },
+            { label: "Replace toothbrush", value: fmt(replaceBrush), dot: "bg-warning" },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center gap-3">
+              <span className={`w-2.5 h-2.5 rounded-full ${row.dot}`} />
+              <span className="text-sm flex-1">{row.label}</span>
+              <span className="text-sm font-semibold tabular-nums">{row.value}</span>
+            </div>
+          ))}
+        </div>
+
         <h2 className="text-base font-semibold mt-6 mb-3">Achievements</h2>
         <div className="grid grid-cols-2 gap-2.5">
           {achievements.map(a => (
@@ -149,7 +194,15 @@ function Profile() {
           </div>
         )}
 
-        <div className="mt-6 space-y-2">
+        <div className="mt-6 rounded-2xl border border-border bg-muted/30 p-4 flex gap-3">
+          <ShieldCheck className="h-5 w-5 text-success shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold">Your data is secure</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Stored locally on this device — never shared with third parties.</p>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2">
           <Link to="/feedback" className="flex items-center gap-3 rounded-2xl bg-card border border-border p-4 shadow-soft">
             <MessageSquare className="h-5 w-5 text-primary" />
             <span className="flex-1 font-medium">Send feedback</span>
