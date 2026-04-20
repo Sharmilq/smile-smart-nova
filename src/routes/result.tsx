@@ -78,10 +78,46 @@ function Result() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Why this score</p>
             <p className="text-sm mt-1 leading-relaxed">{reason}</p>
-          </div>
         </div>
 
-        {/* Compare with previous */}
+        {/* Oral Health Risk Summary */}
+        <section className="mt-4">
+          <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-primary" /> Oral Health Risk Summary
+          </h2>
+          <div className={`rounded-2xl border-2 p-4 shadow-soft ${
+            risk.tone === "good" ? "border-success/30 bg-success/5"
+            : risk.tone === "warn" ? "border-warning/40 bg-warning/5"
+            : "border-destructive/30 bg-destructive/5"
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className={`relative inline-flex w-3 h-3 rounded-full ${
+                risk.tone === "good" ? "bg-success" : risk.tone === "warn" ? "bg-warning" : "bg-destructive"
+              }`}>
+                <span className={`absolute inset-0 rounded-full animate-ping opacity-60 ${
+                  risk.tone === "good" ? "bg-success" : risk.tone === "warn" ? "bg-warning" : "bg-destructive"
+                }`} />
+              </span>
+              <p className="font-semibold text-sm">{risk.level} Risk</p>
+              <span className="ml-auto text-[11px] text-muted-foreground">{risk.concerns.length} {risk.concerns.length === 1 ? "concern" : "concerns"}</span>
+            </div>
+            {risk.concerns.length > 0 ? (
+              <ul className="mt-3 space-y-1.5">
+                {risk.concerns.map((c, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${
+                      c.severity === "good" ? "bg-success" : c.severity === "warn" ? "bg-warning" : "bg-destructive"
+                    }`} />
+                    <span className="text-base">{c.icon}</span>
+                    <span className={c.severity === "bad" ? "font-medium" : ""}>{c.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">No major concerns detected — keep it up! 🎉</p>
+            )}
+          </div>
+        </section>
         {delta !== null && previous && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
@@ -217,16 +253,44 @@ function Result() {
           </div>
         </section>
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        {/* Consultation advice */}
+        <section className={`mt-6 rounded-2xl p-4 border-2 ${
+          strongConsult ? "border-destructive/40 bg-destructive/5" : "border-primary/20 bg-primary/5"
+        }`}>
+          <div className="flex gap-3">
+            <div className={`rounded-full p-2 h-fit shrink-0 ${
+              strongConsult ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"
+            }`}>
+              <HeartPulse className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">
+                {strongConsult ? "Please consult a dentist soon" : "Consultation advice"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {strongConsult
+                  ? "Your symptoms (gum pain or frequent bleeding) need professional attention. Book a check-up."
+                  : "Consult a dentist if symptoms persist or worsen between visits."}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-6 grid grid-cols-3 gap-2.5">
           <Button variant="outline" className="h-12 rounded-xl active:scale-[0.97] transition-transform" onClick={() => setShowReport(true)}>
-            <Download className="h-4 w-4 mr-2" /> Report
+            <Download className="h-4 w-4 mr-1.5" /> Report
+          </Button>
+          <Button variant="outline" className="h-12 rounded-xl active:scale-[0.97] transition-transform" onClick={() => setShowShare(true)}>
+            <Share2 className="h-4 w-4 mr-1.5" /> Share
           </Button>
           <Link to="/assessment">
             <Button className="w-full h-12 rounded-xl bg-gradient-primary text-primary-foreground active:scale-[0.97] transition-transform">
-              <RefreshCw className="h-4 w-4 mr-2" /> Retake
+              <RefreshCw className="h-4 w-4 mr-1.5" /> Retake
             </Button>
           </Link>
         </div>
+
+        <ShareReportSheet open={showShare} onClose={() => setShowShare(false)} summary={shareSummary} />
       </div>
 
       {/* Download report modal (UI preview) */}
