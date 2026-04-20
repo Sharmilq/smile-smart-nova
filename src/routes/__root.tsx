@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 
@@ -69,5 +70,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => {
+    try {
+      const dark = typeof window !== "undefined" && localStorage.getItem("dn_pref_dark") === "1";
+      document.documentElement.classList.toggle("dark", dark);
+    } catch { /* ignore */ }
+  }, []);
   return <Outlet />;
 }

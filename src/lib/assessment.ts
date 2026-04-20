@@ -140,6 +140,89 @@ export function calcScore(answers: AssessmentAnswers) {
   return { score, level };
 }
 
+// Per-question score deltas (positive = healthy, negative = risky) used to
+// build a transparent breakdown shown to the user.
+const DELTA_LABELS: Record<number, string> = {
+  1: "Brushing frequency",
+  2: "Brushing duration",
+  3: "Flossing habit",
+  4: "Gum bleeding",
+  5: "Tooth sensitivity",
+  6: "Sugar intake",
+  7: "Tobacco use",
+  8: "Dental checkup",
+  9: "Bad breath",
+  10: "Teeth grinding",
+  11: "Hydration",
+  12: "Staining drinks",
+  13: "Smile confidence",
+};
+
+export interface ScoreDelta {
+  label: string;
+  delta: number; // positive or negative contribution
+  reason: string;
+}
+
+export function getScoreBreakdown(answers: AssessmentAnswers): ScoreDelta[] {
+  const out: ScoreDelta[] = [];
+  for (const q of QUESTIONS) {
+    const a = answers[q.id];
+    const opt = q.options.find((o) => o.value === a);
+    if (!opt) continue;
+    // Map weight (0..3) to a +/- delta. weight 0 -> +10, 1 -> 0, 2 -> -8, 3 -> -12
+    const deltaMap: Record<number, number> = { 0: 10, 1: 0, 2: -8, 3: -12 };
+    const delta = deltaMap[opt.weight] ?? 0;
+    if (delta === 0) continue;
+    out.push({
+      label: DELTA_LABELS[q.id] ?? q.title,
+      delta,
+      reason: delta > 0 ? `${opt.label} 👍` : opt.label,
+    });
+  }
+  return out.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+}
+
+export function getScoreReason(answers: AssessmentAnswers): string {
+  const breakdown = getScoreBreakdown(answers);
+  const negatives = breakdown.filter((b) => b.delta < 0).slice(0, 3).map((b) => b.label.toLowerCase());
+  const positives = breakdown.filter((b) => b.delta > 0).slice(0, 2).map((b) => b.label.toLowerCase());
+  if (negatives.length === 0 && positives.length > 0) {
+    return `Score boosted by your ${positives.join(" and ")}.`;
+  }
+  if (negatives.length === 0) return "Balanced answers — keep your routine consistent.";
+  return `Score reduced due to ${negatives.join(", ")}${positives.length ? `; boosted by ${positives.join(" and ")}` : ""}.`;
+}
+
+export function shouldRecommendDentist(answers: AssessmentAnswers): boolean {
+  // Frequent gum bleeding, severe sensitivity, or long overdue checkup
+  if (answers[4] === "often") return true;
+  if (answers[5] === "severe") return true;
+  if (answers[8] === "more") return true;
+  if (answers[9] === "often" && (answers[4] === "sometimes" || answers[4] === "often")) return true;
+  return false;
+}
+
+export interface ImprovementItem {
+  text: string;
+  priority: "high" | "medium" | "low";
+}
+
+export function getImprovementPlan(answers: AssessmentAnswers): ImprovementItem[] {
+  const plan: ImprovementItem[] = [];
+  if (answers[1] !== "twice") plan.push({ text: "Brush twice daily — morning and before bed", priority: "high" });
+  if (answers[2] !== "2min") plan.push({ text: "Brush for the full 2 minutes each session", priority: "medium" });
+  if (answers[3] !== "daily") plan.push({ text: "Floss at least once a day", priority: "medium" });
+  if (answers[4] === "sometimes" || answers[4] === "often") plan.push({ text: "Switch to soft bristles and book a dental check-up for bleeding gums", priority: "high" });
+  if (answers[6] === "daily" || answers[6] === "multi") plan.push({ text: "Reduce sugary snacks and rinse with water after sweets", priority: "high" });
+  if (answers[7] === "occasional" || answers[7] === "daily") plan.push({ text: "Cut down on tobacco — major risk for gums", priority: "high" });
+  if (answers[8] === "2y" || answers[8] === "more") plan.push({ text: "Schedule a dental check-up soon", priority: "high" });
+  if (answers[11] === "less") plan.push({ text: "Drink at least 6–8 glasses of water daily", priority: "low" });
+  if (answers[10] === "often") plan.push({ text: "Ask your dentist about a night guard for grinding", priority: "medium" });
+  if (plan.length === 0) plan.push({ text: "Maintain your current routine — you're doing great!", priority: "low" });
+  return plan.slice(0, 6);
+}
+
 export function getRecommendations(answers: AssessmentAnswers): { issues: string[]; tips: string[] } {
   const issues: string[] = [];
   const tips: string[] = [];

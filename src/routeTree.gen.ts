@@ -18,11 +18,13 @@ import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as AssessmentRouteImport } from './routes/assessment'
+import { Route as AppointmentRouteImport } from './routes/appointment'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EducationIndexRouteImport } from './routes/education.index'
 import { Route as EducationSlugRouteImport } from './routes/education.$slug'
@@ -72,6 +74,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -97,6 +104,11 @@ const AssessmentRoute = AssessmentRouteImport.update({
   path: '/assessment',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppointmentRoute = AppointmentRouteImport.update({
+  id: '/appointment',
+  path: '/appointment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -115,11 +127,13 @@ const EducationSlugRoute = EducationSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
@@ -134,11 +148,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
@@ -154,11 +170,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/appointment': typeof AppointmentRoute
   '/assessment': typeof AssessmentRoute
   '/edit-profile': typeof EditProfileRoute
   '/feedback': typeof FeedbackRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
@@ -175,11 +193,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
     | '/forgot-password'
     | '/home'
+    | '/how-it-works'
     | '/login'
     | '/onboarding'
     | '/profile'
@@ -194,11 +214,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
     | '/forgot-password'
     | '/home'
+    | '/how-it-works'
     | '/login'
     | '/onboarding'
     | '/profile'
@@ -213,11 +235,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/appointment'
     | '/assessment'
     | '/edit-profile'
     | '/feedback'
     | '/forgot-password'
     | '/home'
+    | '/how-it-works'
     | '/login'
     | '/onboarding'
     | '/profile'
@@ -233,11 +257,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppointmentRoute: typeof AppointmentRoute
   AssessmentRoute: typeof AssessmentRoute
   EditProfileRoute: typeof EditProfileRoute
   FeedbackRoute: typeof FeedbackRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HomeRoute: typeof HomeRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
@@ -316,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/home': {
       id: '/home'
       path: '/home'
@@ -351,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/appointment': {
+      id: '/appointment'
+      path: '/appointment'
+      fullPath: '/appointment'
+      preLoaderRoute: typeof AppointmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -377,11 +417,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppointmentRoute: AppointmentRoute,
   AssessmentRoute: AssessmentRoute,
   EditProfileRoute: EditProfileRoute,
   FeedbackRoute: FeedbackRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HomeRoute: HomeRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
