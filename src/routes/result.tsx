@@ -78,6 +78,7 @@ function Result() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Why this score</p>
             <p className="text-sm mt-1 leading-relaxed">{reason}</p>
+          </div>
         </div>
 
         {/* Oral Health Risk Summary */}
