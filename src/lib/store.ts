@@ -63,7 +63,30 @@ export const store = {
     { id: "1", label: "Morning Brushing", time: "07:30", days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], enabled: true },
     { id: "2", label: "Night Brushing", time: "22:00", days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], enabled: true },
     { id: "3", label: "Floss", time: "21:45", days: ["Mon","Wed","Fri"], enabled: false },
+    { id: "4", label: "Replace Toothbrush (every 3 months)", time: "09:00", days: ["Sun"], enabled: true },
   ]),
+  getStreak: () => {
+    const all = read<AssessmentResult[]>(KEY_RESULTS, []);
+    if (all.length === 0) return 0;
+    const days = new Set(all.map(r => new Date(r.date).toDateString()));
+    let streak = 0;
+    const cursor = new Date();
+    while (days.has(cursor.toDateString())) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  },
+  getAchievements: () => {
+    const all = read<AssessmentResult[]>(KEY_RESULTS, []);
+    const list: { id: string; label: string; icon: string; earned: boolean }[] = [
+      { id: "starter", label: "Hygiene Starter", icon: "🌱", earned: all.length >= 1 },
+      { id: "consistent", label: "Consistent Carer", icon: "🔁", earned: all.length >= 3 },
+      { id: "pro", label: "Oral Care Pro", icon: "🏆", earned: all.some(r => r.score >= 85) },
+      { id: "improver", label: "Improver", icon: "📈", earned: all.length >= 2 && all[0].score > all[all.length - 1].score },
+    ];
+    return list;
+  },
   setReminders: (r: Reminder[]) => write(KEY_REMINDERS, r),
   isAuthed: () => read<boolean>(KEY_AUTH, false),
   setAuthed: (v: boolean) => write(KEY_AUTH, v),
